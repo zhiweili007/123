@@ -1,0 +1,27 @@
+
+name: 刷步数自动运行
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2,4,6,8,10,14 * * *'  # UTC时间，对应北京时间10点到22点每隔2小时一次
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v3
+
+      - name: 设置 Python 环境
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: 安装依赖（如有）
+        run: |
+          pip install -r requirements.txt || echo "跳过依赖安装"
+
+      - name: 运行主脚本
+        run: |
+          python main.py
