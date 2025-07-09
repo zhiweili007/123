@@ -1,30 +1,38 @@
-
-name: 刷步数自动运行
+name: 刷步数
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # 支持手动触发
   schedule:
-    - cron: '0 2,4,6,8,10,14 * * *'  # UTC时间，对应北京时间10点到22点每隔2小时一次
+    - cron: '0 2,4,6,8,10,14 * * *'  # 每天 UTC 时间固定运行（北京时间10,12,14,16,18,22点）
 
 jobs:
-  run:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: 拉取代码
-        uses: actions/checkout@v3
+    - name: 拉取代码
+      uses: actions/checkout@v3
 
-      - name: 设置 Python 环境
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
+    - name: 显示当前时间（UTC）
+      run: date -u
 
-      - name: 安装依赖（如有）
-        run: |
-          pip install -r requirements.txt || echo "跳过依赖安装"
+    - name: 设置 Python 环境
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
 
-      - name: 运行主脚本
-  env:
-    CONFIG: ${{ secrets.CONFIG }}
-  run: |
-    python main.py
+    - name: 安装依赖（如果有 requirements.txt）
+      run: |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        else
+          echo "未找到 requirements.txt，跳过依赖安装"
+        fi
+
+    - name: 运行刷步脚本
+      env:
+        CONFIG: ${{ secrets.CONFIG }}
+      run: |
+        echo "开始执行刷步数脚本"
+        python main.py "${CONFIG}"
 
