@@ -23,5 +23,8 @@ jobs:
           pip install -r requirements.txt || echo "跳过依赖安装"
 
       - name: 运行主脚本
-        run: |
-          python main.py
+  env:
+    CONFIG: ${{ secrets.CONFIG }}
+  run: |
+    python main.py
+
